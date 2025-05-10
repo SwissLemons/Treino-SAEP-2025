@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class Conexao {
@@ -32,5 +33,59 @@ public class Conexao {
 			System.out.println("Desconectado.");
 		this.idConexao.close();
 		}
+	}
+	public boolean cadastrarUsuario(String nome, String email) throws SQLException, ClassNotFoundException {
+		conectar();
+		String sql = "insert into usuarios (nome,email) values (?,?)";
+		try (PreparedStatement comando = getIdConexao().prepareStatement(sql)) {
+	        comando.setString(1, nome);
+	        comando.setString(2, email);
+	        int rowsInserted = comando.executeUpdate();
+	        comando.close();
+	        desConectar();
+	        return rowsInserted > 0;
+	    }		
+	}
+	public boolean cadastrarTarefa(int id_usuario,String descricao, String setor, String prioridade, String estatus) throws ClassNotFoundException, SQLException {
+		conectar();
+		String sql = "insert into tarefas (id_usuario,descricao,setor,prioridade,estatus) values (?,?,?,?,?)";
+		try (PreparedStatement comando = getIdConexao().prepareStatement(sql)) {
+			comando.setInt(1, id_usuario);
+	        comando.setString(2, descricao);
+	        comando.setString(3, setor);
+	        comando.setString(4, prioridade);
+	        comando.setString(5, estatus);
+	        int rowsInserted = comando.executeUpdate();
+	        comando.close();
+	        desConectar();
+	        return rowsInserted > 0;
+	    }		
+	}
+	public boolean atualizarTarefa(int id_usuario,String descricao,String setor,String prioridade,String estatus,int id) throws ClassNotFoundException, SQLException {
+		conectar();
+		String sql = "update tarefas set id_usuario=?,descricao=?,setor=?,prioridade=?,estatus=? where id=?";
+		try (PreparedStatement comando = getIdConexao().prepareStatement(sql)) {
+			comando.setInt(1, id_usuario);
+	        comando.setString(2, descricao);
+	        comando.setString(3, setor);
+	        comando.setString(4, prioridade);
+	        comando.setString(5, estatus);
+	        comando.setInt(6, id);
+	        int rowsInserted = comando.executeUpdate();
+	        comando.close();
+	        desConectar();
+	        return rowsInserted > 0;
+	    }		
+	}
+	public boolean excluirTarefa(int id) throws ClassNotFoundException, SQLException {
+		conectar();
+		String sql = "delete from tarefas where id=?";
+		try (PreparedStatement comando = this.idConexao.prepareStatement(sql)){
+			comando.setInt(1, id);	
+			comando.executeUpdate();
+			this.desConectar();
+			
+		}
+		return false;
 	}
 }
